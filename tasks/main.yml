@@ -1,0 +1,85 @@
+---
+
+- name: Install dependencies
+  apt:
+    state: present
+    pkg: "{{ moloch_depnedencies }}"
+  tags:
+    - requirements
+
+- name: Check if Moloch is installed
+  command: dpkg-query -W moloch
+  register: moloch_check_deb
+  failed_when: moloch_check_deb.rc > 1
+  changed_when: moloch_check_deb.rc == 1
+  tags:
+    - moloch
+
+- name: Download Moloch package
+  get_url: url={{ moloch_deb_url }} dest=/tmp/moloch.deb
+  when: moloch_check_deb.rc == 1
+  tags:
+    - moloch
+
+- name: Install Moloch
+  apt: deb="/tmp/moloch.deb"
+  when: moloch_check_deb.rc == 1
+  tags:
+    - moloch
+
+- name: Install patched Configure script
+  template:
+    src: data/moloch/bin/Configure
+    dest: /data/moloch/bin/Configure
+    owner: root
+    group: root
+    mode: 0755
+  tags:
+    - moloch 
+
+- name: Run configuration script
+  shell: /data/moloch/bin/Configure
+  environment:
+    MOLOCH_INTERFACE: "{{ moloch_interface }}"
+    MOLOCH_LOCALELASTICSEARCH: "yes"
+    MOLOCH_PASSWORD: "{{ moloch_password }}"
+    MOLOCH_INET: yes"
+  tags:
+    - moloch
+
+- name: Start and enable Elasticsearch
+  service:
+    name: elasticsearch
+    state: started
+    enabled: yes
+  tags:
+    - elasticsearch
+
+- name: Waiting for Elasticsearch to start up
+  pause:
+    seconds: 30
+
+- name: Initialize Elasticsearch
+  command: /data/moloch/db/db.pl http://localhost:9200 init
+  tags: 
+    - moloch
+    - elasticsearch
+
+- name: Add Admin user
+  command: /data/moloch/bin/moloch_add_user.sh admin "Admin User" "{{ moloch_admin_password }}" --admin
+
+- name: Start and enable molochcapture
+  service:
+    name: molochcapture
+    state: started
+    enabled: yes
+  tags:
+    - moloch
+
+- name: Start and enable molochviewer
+  service:
+    name: molochviewer
+    state: started
+    enabled: yes
+  tags:
+    - moloch

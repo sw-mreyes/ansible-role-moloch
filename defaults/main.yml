@@ -1,0 +1,13 @@
+---
+# The latest releases are listed here: https://molo.ch/index.html#downloads
+moloch_deb_url: "https://files.molo.ch/builds/ubuntu-18.04/moloch_1.5.3-1_amd64.deb" 
+
+moloch_depnedencies:
+  - libwww-perl
+  - libjson-perl
+  - libyaml-dev
+  - openjdk-11-jre-headless
+
+moloch_interface: eth0
+moloch_password: SomeRandomString
+moloch_admin_password: SomeOtherRandomString
