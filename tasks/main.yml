@@ -75,6 +75,8 @@
     enabled: yes
   tags:
     - moloch
+  when:
+    moloch_enable_capturing == true
 
 - name: Start and enable molochviewer
   service:

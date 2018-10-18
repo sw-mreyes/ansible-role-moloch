@@ -9,5 +9,6 @@ moloch_depnedencies:
   - openjdk-11-jre-headless
 
 moloch_interface: eth0
+moloch_enable_capturing: yes
 moloch_password: SomeRandomString
 moloch_admin_password: SomeOtherRandomString
