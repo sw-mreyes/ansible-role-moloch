@@ -55,9 +55,12 @@
   tags:
     - elasticsearch
 
-- name: Waiting for Elasticsearch to start up
-  pause:
-    seconds: 30
+- name: wait for Elasticsearch cluster state 'yellow'/'green'
+  uri: url=http://localhost:{{ es_http_port }}/_cluster/health method=GET
+  register: response
+  until: "response.json.status == 'green' or response.json.status == 'yellow'"
+  retries: 50
+  delay: 30
 
 - name: Initialize Elasticsearch
   command: /data/moloch/db/db.pl http://localhost:9200 init
