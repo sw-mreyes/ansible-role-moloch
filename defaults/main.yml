@@ -7,8 +7,10 @@ moloch_depnedencies:
   - libjson-perl
   - libyaml-dev
   - openjdk-11-jre-headless
+  - libmagic-dev
 
 moloch_interface: eth0
 moloch_enable_capturing: yes
 moloch_password: SomeRandomString
 moloch_admin_password: SomeOtherRandomString
+expected_moloch_db_version: 64

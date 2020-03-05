@@ -62,11 +62,17 @@
   retries: 50
   delay: 30
 
+- name: Check if the moloch db is Initialized already
+  shell: /data/moloch/db/db.pl http://localhost:9200 info | grep "DB Version" | tail -c5
+  register: moloch_db_version
+
 - name: Initialize Elasticsearch
   command: /data/moloch/db/db.pl http://localhost:9200 init
   tags: 
     - moloch
     - elasticsearch
+  when: moloch_db_version.stdout|int != expected_moloch_db_version
+  
 
 - name: Add Admin user
   command: /data/moloch/bin/moloch_add_user.sh admin "Admin User" "{{ moloch_admin_password }}" --admin
